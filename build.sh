@@ -35,7 +35,18 @@ if [ -z "$TARGET" ]; then
     exit 1
 fi
 
+if ! source .build.rc || [ -z "$SRC_ROOT" ]; then
+    echo -e "Create a .build.rc file here and define\nSRC_ROOT=<path/to/aospa/source>"
+    exit 1
+fi
+
 KERNEL_DIR="$SRC_ROOT/device/xiaomi/$TARGET-kernel"
+
+if [ ! -d "$KERNEL_DIR" ]; then
+    echo "$KERNEL_DIR does not exist!"
+    exit 1
+fi
+
 KERNEL_COPY_TO="$KERNEL_DIR"
 DTB_COPY_TO="$KERNEL_DIR/dtbs"
 DTBO_COPY_TO="$DTB_COPY_TO/dtbo.img"
