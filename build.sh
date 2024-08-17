@@ -11,6 +11,7 @@ PREBUILTS_DIR="$KP_ROOT/prebuilts/kernel-build-tools/linux-x86"
 
 DO_CLEAN=false
 NO_LTO=false
+ONLY_CONFIG=false
 TARGET=
 DTB_WILDCARD="*"
 DTBO_WILDCARD="*"
@@ -22,6 +23,9 @@ while [ "${#}" -gt 0 ]; do
                 ;;
         -n | --no-lto )
                 NO_LTO=true
+                ;;
+        -o | --only-config )
+                ONLY_CONFIG=true
                 ;;
         * )
                 TARGET="${1}"
@@ -116,6 +120,8 @@ $NO_LTO && (
         --set-str LOCALVERSION "-aospa-nolto"
     echo -e "\nDisabled LTO!"
 )
+
+$ONLY_CONFIG && exit
 
 echo -e "\nBuilding kernel...\n"
 m Image modules dtbs
