@@ -68,6 +68,7 @@ DEFCONFIG="gki_defconfig"
 DEFCONFIGS="vendor/waipio_GKI.config \
 vendor/xiaomi_GKI.config \
 vendor/aospa.config \
+vendor/personal.config \
 vendor/debugfs.config"
 
 MODULES_SRC="../sm8450-modules/qcom/opensource"
