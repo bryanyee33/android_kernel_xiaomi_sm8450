@@ -15,6 +15,7 @@ ONLY_CONFIG=false
 TARGET=
 DTB_WILDCARD="*"
 DTBO_WILDCARD="*"
+ONLY_IMAGE=true
 
 while [ "${#}" -gt 0 ]; do
     case "${1}" in
@@ -142,8 +143,14 @@ for module in $MODULES; do
         INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 modules_install
 done
 
-echo -e "\nKernel compiled succesfully!\nMerging dtb's...\n"
+echo -e "\nKernel compiled succesfully!\n"
 
+cp out/arch/arm64/boot/Image $KERNEL_COPY_TO
+echo "Copied kernel to $KERNEL_COPY_TO."
+
+$ONLY_IMAGE && exit
+
+echo -e "\nMerging dtb's...\n"
 rm -rf out/dtbs{,-base}
 mkdir out/dtbs{,-base}
 mv  out/arch/arm64/boot/dts/vendor/qcom/$DTB_WILDCARD.dtb \
@@ -167,9 +174,6 @@ echo -e "\nCopying files...\n"
 # DTBO_COPY_TO="AnyKernel3/dtbo.img"
 # VBOOT_DIR="AnyKernel3/vendor_boot_modules"
 # VDLKM_DIR="AnyKernel3/vendor_dlkm_modules"
-
-cp out/arch/arm64/boot/Image $KERNEL_COPY_TO
-echo "Copied kernel to $KERNEL_COPY_TO."
 
 if [ -d "$DTB_COPY_TO" ]; then
     rm -f $DTB_COPY_TO/*.dtb
