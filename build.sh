@@ -117,33 +117,16 @@ $DO_CLEAN && (
     echo "Cleaned output directories."
 )
 
+echo -e "Generating config...\n"
 mkdir -p out
-echo -e "Finding latest config modified time...\n"
-latest=0
-for config_path in $DEFCONFIG $DEFCONFIGS vendor/${TARGET}_GKI.config scripts/kconfig/merge_config.sh; do
-    temp=$(git log -1 --pretty="format:%ct" -- $config_path)
-    if [ "$temp" -gt "$latest" ]; then
-        latest=$temp
-    fi
-done
-
-if [ -f out/.config_$latest ]; then
-    echo -e "Reusing previous config...\n"
-    cp out/.config_$latest out/.config
-else
-    rm out/.config_*
-    echo -e "Generating config...\n"
-    m $DEFCONFIG
-    m ./scripts/kconfig/merge_config.sh $DEFCONFIGS vendor/${TARGET}_GKI.config
-    # Delete out/.config_* if changing from LTO to NO_LTO
-    $NO_LTO && (
-        scripts/config --file out/.config \
-            -d LTO_CLANG_FULL -e LTO_NONE \
-            --set-str LOCALVERSION "-aospa-nolto"
-        echo -e "\nDisabled LTO!"
-    )
-    cp out/.config out/.config_$latest
-fi
+m $DEFCONFIG
+m ./scripts/kconfig/merge_config.sh $DEFCONFIGS vendor/${TARGET}_GKI.config
+$NO_LTO && (
+    scripts/config --file out/.config \
+        -d LTO_CLANG_FULL -e LTO_NONE \
+        --set-str LOCALVERSION "-aospa-nolto"
+    echo -e "\nDisabled LTO!"
+)
 
 $ONLY_CONFIG && exit
 
