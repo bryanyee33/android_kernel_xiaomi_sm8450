@@ -131,6 +131,7 @@ if [ -f out/.config_$latest ]; then
     echo -e "Reusing previous config...\n"
     cp out/.config_$latest out/.config
 else
+    rm out/.config_*
     echo -e "Generating config...\n"
     m $DEFCONFIG
     m ./scripts/kconfig/merge_config.sh $DEFCONFIGS vendor/${TARGET}_GKI.config
@@ -141,6 +142,7 @@ else
             --set-str LOCALVERSION "-aospa-nolto"
         echo -e "\nDisabled LTO!"
     )
+    cp out/.config out/.config_$latest
 fi
 
 $ONLY_CONFIG && exit
