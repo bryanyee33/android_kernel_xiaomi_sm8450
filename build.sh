@@ -121,7 +121,7 @@ mkdir -p out
 echo -e "Finding latest config modified time...\n"
 latest=0
 for config_path in $DEFCONFIG $DEFCONFIGS vendor/${TARGET}_GKI.config scripts/kconfig/merge_config.sh; do
-    temp=$(git log -1 --pretty="format:%ct" $config_path)
+    temp=$(git log -1 --pretty="format:%ct" -- $config_path)
     if [ "$temp" -gt "$latest" ]; then
         latest=$temp
     fi
