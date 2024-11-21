@@ -68,6 +68,7 @@ DEFCONFIG="gki_defconfig"
 DEFCONFIGS="vendor/waipio_GKI.config \
 vendor/xiaomi_GKI.config \
 vendor/aospa.config \
+vendor/personal.config \
 vendor/debugfs.config"
 
 MODULES_SRC="../sm8450-modules/qcom/opensource"
@@ -104,6 +105,7 @@ export PATH="$TC_DIR/bin:$PREBUILTS_DIR/bin:$PATH"
 
 function m() {
     make -j$(nproc --all) O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 \
+        KBUILD_BUILD_USER=bryanyee33 KBUILD_BUILD_HOST=android-build \
         DTC_EXT="$PREBUILTS_DIR/bin/dtc" \
         DTC_OVERLAY_TEST_EXT="$PREBUILTS_DIR/bin/ufdt_apply_overlay" \
         TARGET_PRODUCT=$TARGET $@ || exit $?
@@ -132,6 +134,7 @@ m Image modules dtbs
 rm -rf out/modules out/*.ko
 m INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 modules_install
 
+<<no_ksu_lkm
 echo -e "\nCopying KSU LKM..."
 ksu_path="$(find $modules_out -name 'kernelsu.ko' -print -quit)"
 if [ -n "$ksu_path" ]; then
@@ -140,6 +143,7 @@ if [ -n "$ksu_path" ]; then
 else
     echo "Unable to locate ksu module!"
 fi
+no_ksu_lkm
 
 echo -e "\nBuilding techpack modules..."
 for module in $MODULES; do
