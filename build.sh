@@ -67,6 +67,7 @@ VDLKM_DIR="$KERNEL_DIR/vendor_dlkm"
 DEFCONFIG="gki_defconfig"
 DEFCONFIGS="vendor/waipio_GKI.config \
 vendor/xiaomi_GKI.config \
+vendor/personal.config \
 vendor/debugfs.config"
 
 MODULES_SRC="../sm8450-modules/qcom/opensource"
@@ -103,6 +104,7 @@ export PATH="$TC_DIR/bin:$PREBUILTS_DIR/bin:$PATH"
 
 function m() {
     make -j$(nproc --all) O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 \
+        KBUILD_BUILD_USER=bryanyee33 KBUILD_BUILD_HOST=android-build \
         DTC_EXT="$PREBUILTS_DIR/bin/dtc" \
         DTC_OVERLAY_TEST_EXT="$PREBUILTS_DIR/bin/ufdt_apply_overlay" \
         TARGET_PRODUCT=$TARGET $@ || exit $?
@@ -118,7 +120,7 @@ mkdir -p out
 m $DEFCONFIG
 m ./scripts/kconfig/merge_config.sh $DEFCONFIGS vendor/${TARGET}_GKI.config
 scripts/config --file out/.config \
-    --set-str LOCALVERSION "-aospa"
+    --set-str LOCALVERSION "-android12-9-00085-g226a9632f13d-ab11136126"
 $NO_LTO && (
     scripts/config --file out/.config \
         -d LTO_CLANG_FULL -e LTO_NONE \
