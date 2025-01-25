@@ -118,8 +118,7 @@ mkdir -p out
 m $DEFCONFIG
 m ./scripts/kconfig/merge_config.sh $DEFCONFIGS vendor/${TARGET}_GKI.config
 scripts/config --file out/.config \
-    --set-str LOCALVERSION "-aospa" \
-    -m CONFIG_KSU
+    --set-str LOCALVERSION "-aospa"
 $NO_LTO && (
     scripts/config --file out/.config \
         -d LTO_CLANG_FULL -e LTO_NONE \
@@ -134,6 +133,7 @@ m Image modules dtbs
 rm -rf out/modules out/*.ko
 m INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 modules_install
 
+<<no_ksu_lkm
 echo -e "\nCopying KSU LKM..."
 ksu_path="$(find $modules_out -name 'kernelsu.ko' -print -quit)"
 if [ -n "$ksu_path" ]; then
@@ -142,6 +142,7 @@ if [ -n "$ksu_path" ]; then
 else
     echo "Unable to locate ksu module!"
 fi
+no_ksu_lkm
 
 echo -e "\nBuilding techpack modules..."
 for module in $MODULES; do
