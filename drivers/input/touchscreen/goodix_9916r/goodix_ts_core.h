@@ -602,6 +602,9 @@ struct goodix_bus_interface {
 	int ic_type;
 	int sub_ic_type;
 	struct device *dev;
+	u8 *rx_buf;
+	u8 *tx_buf;
+	struct mutex mutex;
 	int (*read)(struct device *dev, unsigned int addr,
 			 unsigned char *data, unsigned int len);
 	int (*write)(struct device *dev, unsigned int addr,
