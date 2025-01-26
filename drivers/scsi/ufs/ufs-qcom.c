@@ -716,6 +716,7 @@ static void ufs_qcom_force_mem_config(struct ufs_hba *hba)
 		qcom_clk_set_flags(clki->clk, CLKFLAG_NORETAIN_PERIPH);
 		qcom_clk_set_flags(clki->clk, CLKFLAG_PERIPH_OFF_CLEAR);
 	}
+	ufshcd_readl(hba, REG_UFS_CFG2);
 }
 
 static int ufs_qcom_hce_enable_notify(struct ufs_hba *hba,
