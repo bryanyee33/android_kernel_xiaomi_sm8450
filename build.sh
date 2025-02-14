@@ -8,6 +8,7 @@ KP_ROOT="$(realpath ../..)"
 SRC_ROOT="$HOME/pa"
 TC_DIR="$KP_ROOT/prebuilts-master/clang/host/linux-x86/clang-r510928"
 PREBUILTS_DIR="$KP_ROOT/prebuilts/kernel-build-tools/linux-x86"
+BRANCH="$(git branch --show-current)"
 
 DO_CLEAN=false
 NO_LTO=false
@@ -118,12 +119,12 @@ mkdir -p out
 m $DEFCONFIG
 m ./scripts/kconfig/merge_config.sh $DEFCONFIGS vendor/${TARGET}_GKI.config
 scripts/config --file out/.config \
-    --set-str LOCALVERSION "-aospa" \
+    --set-str LOCALVERSION "-$BRANCH" \
     -m CONFIG_KSU
 $NO_LTO && (
     scripts/config --file out/.config \
         -d LTO_CLANG_FULL -e LTO_NONE \
-        --set-str LOCALVERSION "-aospa-nolto"
+        --set-str LOCALVERSION "-${BRANCH}-nolto"
     echo -e "\nDisabled LTO!"
 )
 
