@@ -645,6 +645,7 @@ struct goodix_ts_hw_ops {
 	int (*game)(struct goodix_ts_core *cd, u8 data0, u8 data1, bool on);
 	int (*charger_on)(struct goodix_ts_core *cd, bool on);
 /* N17 code for HQ-296762 by jiangyue at 2023/6/2 end */
+	int (*switch_report_rate)(struct goodix_ts_core *cd, bool on);
 };
 
 /*
@@ -761,6 +762,7 @@ struct goodix_ts_core {
 /* N17 code for HQ-290598 by jiangyue at 2023/6/6 end */
 	int fod_status;
 	int nonui_status;
+	int report_rate;
 	struct delayed_work panel_notifier_register_work;
 	struct pm_qos_request pm_qos_req_irq;
 };

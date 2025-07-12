@@ -2181,6 +2181,9 @@ out:
 	if (core_data->palm_status)
 		ret = hw_ops->palm_on(core_data, core_data->palm_status);
 /* N17 code for HQ-296762 by jiangyue at 2023/6/2 end */
+	/* enable high report rate */
+	if (core_data->report_rate)
+		hw_ops->switch_report_rate(core_data, true);
 	/* enable irq */
 	hw_ops->irq_enable(core_data, true);
 	/* open esd */
@@ -3016,6 +3019,14 @@ static int goodix_set_cur_value(int gtp_mode, int gtp_value)
 		return 0;
 	}
 
+	if (gtp_mode == Touch_Report_Rate && goodix_core_data &&
+	    gtp_value >= 0) {
+		goodix_core_data->report_rate = gtp_value;
+		ts_info("Touch_Report_Rate value [%d]\n", gtp_value);
+		goodix_core_data->hw_ops->switch_report_rate(goodix_core_data, gtp_value);
+		return 0;
+	}
+
 /* N17 code for HQ-322938 by zhangzhijian5 at 2023/8/28 start */
 	if (gtp_mode >= Touch_Mode_NUM) {
 		ts_err("gtp mode is error:%d", gtp_mode);
@@ -3110,6 +3121,13 @@ static void goodix_init_touchmode_data(void)
 	xiaomi_touch_interfaces.touch_mode[Touch_Game_Mode][GET_DEF_VALUE] = 0;
 	xiaomi_touch_interfaces.touch_mode[Touch_Game_Mode][SET_CUR_VALUE] = 0;
 	xiaomi_touch_interfaces.touch_mode[Touch_Game_Mode][GET_CUR_VALUE] = 0;
+
+	/* Touch Report Rate Switch */
+	xiaomi_touch_interfaces.touch_mode[Touch_Report_Rate][GET_MAX_VALUE] = 1;
+	xiaomi_touch_interfaces.touch_mode[Touch_Report_Rate][GET_MIN_VALUE] = 0;
+	xiaomi_touch_interfaces.touch_mode[Touch_Report_Rate][GET_DEF_VALUE] = 0;
+	xiaomi_touch_interfaces.touch_mode[Touch_Report_Rate][SET_CUR_VALUE] = 0;
+	xiaomi_touch_interfaces.touch_mode[Touch_Report_Rate][GET_CUR_VALUE] = 0;
 
 	/* Acitve Mode */
 	xiaomi_touch_interfaces.touch_mode[Touch_Active_MODE][GET_MAX_VALUE] = 1;

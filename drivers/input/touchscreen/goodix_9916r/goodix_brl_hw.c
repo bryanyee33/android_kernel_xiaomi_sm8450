@@ -1802,6 +1802,24 @@ static int brl_game(struct goodix_ts_core *cd, u8 data0, u8 data1, bool on)
 }
 /* N17 code for HQ-296762 by jiangyue at 2023/6/2 end */
 
+#define GOODIX_HIGH_RATE_CMD 0xC0
+static int brl_switch_report_rate(struct goodix_ts_core *cd, bool on)
+{
+	struct goodix_ts_cmd cmd;
+
+	cmd.cmd = GOODIX_HIGH_RATE_CMD;
+	cmd.len = 5;
+	cmd.data[0] = on;
+	if (cd->hw_ops->send_cmd(cd, &cmd)) {
+		ts_err("failed send report rate cmd, on = %d", on);
+		return -EINVAL;
+	} else {
+		ts_info("report rate switch: %s", on ? "360HZ" : "240HZ");
+	}
+
+	return 0;
+}
+
 static struct goodix_ts_hw_ops brl_hw_ops = {
 	.power_on = brl_power_on,
 	.resume = brl_resume,
@@ -1828,6 +1846,7 @@ static struct goodix_ts_hw_ops brl_hw_ops = {
 	.palm_on = brl_palm_on,
 	.game = brl_game,
 /* N17 code for HQ-296762 by jiangyue at 2023/6/2 end */
+	.switch_report_rate = brl_switch_report_rate,
 };
 
 struct goodix_ts_hw_ops *goodix_get_hw_ops(void)
