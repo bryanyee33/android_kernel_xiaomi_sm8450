@@ -9,6 +9,8 @@ SRC_ROOT="$HOME/pa"
 TC_DIR="$KP_ROOT/prebuilts-master/clang/host/linux-x86/clang-r510928"
 PREBUILTS_DIR="$KP_ROOT/prebuilts/kernel-build-tools/linux-x86"
 BRANCH="$(git branch --show-current)"
+MODULES_REPO="sm8450-modules"
+DT_REPO="sm8450-devicetrees"
 
 DO_CLEAN=false
 NO_LTO=false
@@ -70,7 +72,7 @@ DEFCONFIGS="vendor/waipio_GKI.config \
 vendor/xiaomi_GKI.config \
 vendor/debugfs.config"
 
-MODULES_SRC="../sm8450-modules/qcom/opensource"
+MODULES_SRC="../$MODULES_REPO/qcom/opensource"
 MODULES="mmrm-driver \
 audio-kernel \
 camera-kernel \
@@ -109,22 +111,38 @@ function m() {
         TARGET_PRODUCT=$TARGET $@ || exit $?
 }
 
+function get_trees_rev() {
+    kernel_rev="$(git rev-parse HEAD | cut -c1-12)"
+    [[ -n "$(git --no-optional-locks status -uno --porcelain)" ]] && kernel_rev+="+"
+
+    modules_rev="$(git -C ../$MODULES_REPO rev-parse HEAD | cut -c1-12)"
+    [[ -n "$(git -C ../$MODULES_REPO --no-optional-locks status -uno --porcelain)" ]] && modules_rev+="+"
+
+    dt_rev="$(git -C ../$DT_REPO rev-parse HEAD | cut -c1-12)"
+    [[ -n "$(git -C ../$DT_REPO --no-optional-locks status -uno --porcelain)" ]] && dt_rev+="+"
+
+    echo "-${kernel_rev}-m${modules_rev}-d${dt_rev}"
+}
+
 $DO_CLEAN && (
-    rm -rf out sm8450-modules
+    rm -rf out $MODULES_REPO
     echo "Cleaned output directories."
 )
 
-echo -e "Generating config...\n"
 mkdir -p out
+export LOCALVERSION="$(get_trees_rev)"
+
+echo -e "Generating config...\n"
 m $DEFCONFIG
 m ./scripts/kconfig/merge_config.sh $DEFCONFIGS vendor/${TARGET}_GKI.config
 scripts/config --file out/.config \
     --set-str LOCALVERSION "-$BRANCH" \
+    -d LOCALVERSION_AUTO \
     -m CONFIG_KSU
 $NO_LTO && (
     scripts/config --file out/.config \
-        -d LTO_CLANG_FULL -e LTO_NONE \
-        --set-str LOCALVERSION "-${BRANCH}-nolto"
+        --set-str LOCALVERSION "-${BRANCH}-nolto" \
+        -d LTO_CLANG_FULL -e LTO_NONE
     echo -e "\nDisabled LTO!"
 )
 
