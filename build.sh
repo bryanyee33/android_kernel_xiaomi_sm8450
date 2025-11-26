@@ -112,13 +112,13 @@ function m() {
 }
 
 function get_trees_rev() {
-    kernel_rev="$(git rev-parse HEAD | cut -c1-12)"
+    kernel_rev="$(git rev-parse HEAD | cut -c1-10)"
     [[ -n "$(git --no-optional-locks status -uno --porcelain)" ]] && kernel_rev+="+"
 
-    modules_rev="$(git -C ../$MODULES_REPO rev-parse HEAD | cut -c1-12)"
+    modules_rev="$(git -C ../$MODULES_REPO rev-parse HEAD | cut -c1-8)"
     [[ -n "$(git -C ../$MODULES_REPO --no-optional-locks status -uno --porcelain)" ]] && modules_rev+="+"
 
-    dt_rev="$(git -C ../$DT_REPO rev-parse HEAD | cut -c1-12)"
+    dt_rev="$(git -C ../$DT_REPO rev-parse HEAD | cut -c1-8)"
     [[ -n "$(git -C ../$DT_REPO --no-optional-locks status -uno --porcelain)" ]] && dt_rev+="+"
 
     echo "-${kernel_rev}-m${modules_rev}-d${dt_rev}"
